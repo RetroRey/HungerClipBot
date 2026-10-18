@@ -1,0 +1,67 @@
+on:
+  schedule:
+    # 22:00 UTC every day (6 PM Eastern in summer, 5 PM in winter). Change as you like.
+    - cron: "0 22 * * *"
+  workflow_dispatch:        # adds a "Run workflow" button for manual/test runs
+    inputs:
+      no_upload:
+        description: "Build only, don't upload (true/false)"
+        required: false
+        default: "false"
+
+# Never run two at once (they'd both grab the same episode number)
+concurrency:
+  group: daily-upload
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write       # lets the bot save the episode number back to the repo
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install Python packages
+        run: pip install -r requirements.txt
+
+      - name: Build and upload
+        env:
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.no_upload }}" = "true" ]; then ARGS="$ARGS --no-upload"; fi
+          eval python bot.py $ARGS
+
+      - name: Save episode number
+        run: |
+          if [ -n "$(git status --porcelain episode_number.txt)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add episode_number.txt
+            git commit -m "Next episode: #$(cat episode_number.txt)"
+            git push
+          else
+            echo "No upload today - episode number unchanged."
+          fi
+
+      - name: Save video as a downloadable artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compilation
+          path: out/
+          retention-days: 3
+          if-no-files-found: ignore
