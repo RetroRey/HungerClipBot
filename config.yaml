@@ -1,0 +1,39 @@
+# ---- What to pull from Twitch ----
+# This bot only ever uses the Hunger category.
+game_name: "Hunger"
+lookback_hours: 24           # only clips created in the last N hours
+max_clips: 15                # most clips a video can have
+max_total_seconds: 600       # stop adding clips past this length (10 min)
+max_clips_per_streamer: 2    # keeps one big streamer from filling the whole video
+language: "en"               # only keep clips in this language ("" = any)
+min_views: 0                 # skip clips below this view count
+
+# ---- Featured channel ----
+# Up to this many of this channel's Hunger clips are always included
+# (their most-viewed ones), even if they'd otherwise rank too low.
+# Use the channel's login name as it appears in its URL: twitch.tv/<this>
+featured_channel: "retrorey"
+featured_clips: 2
+
+# ---- Minimum to post ----
+# A video is only made if it has at least min_clips different clips
+# OR at least min_total_seconds of footage. Otherwise the day is skipped.
+min_clips: 10
+min_total_seconds: 300       # 5 minutes
+
+# ---- Video output ----
+width: 1920
+height: 1080
+fps: 30
+caption_font_size: 48
+caption_position: "bottom-left"   # bottom-left | bottom-right | top-left | top-right
+
+# ---- YouTube upload ----
+# {game} and {date} are filled in automatically
+title_template: "Top {game} Twitch Clips of the Day - {date}"
+description_header: |
+  The best {game} moments from Twitch today. All credit goes to the streamers below - go follow them!
+tags: ["twitch", "clips", "highlights", "gaming"]
+category_id: "20"            # 20 = Gaming
+privacy_status: "public"     # public | unlisted | private
+made_for_kids: false
