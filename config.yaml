@@ -1,7 +1,7 @@
 # ---- What to pull from Twitch ----
 # This bot only ever uses the Hunger category.
 game_name: "Hunger"
-lookback_hours: 24           # only clips created in the last N hours
+lookback_hours: 87600           # only clips created in the last N hours
 max_clips: 15                # most clips a video can have
 max_total_seconds: 600       # stop adding clips past this length (10 min)
 max_clips_per_streamer: 2    # keeps one big streamer from filling the whole video
