@@ -1,3 +1,5 @@
+name: Daily Hunger clips upload
+
 on:
   schedule:
     # 22:00 UTC every day (6 PM Eastern in summer, 5 PM in winter). Change as you like.
